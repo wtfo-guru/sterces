@@ -1,0 +1,79 @@
+[tool.poetry]
+name = "sterces"
+version = "0.1.0"
+description = "Command line interface for pykeepass"
+license = "MIT"
+authors = ["Quien Sabe <qs5579@mail.com>"]
+readme = "README.md"
+
+homepage = "https://github.com/wtfo-guru/sterces"
+documentation = "https://python-sterces.readthedocs.io/en/stable"
+
+keywords = []
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: System Administrators",
+  "Operating System :: POSIX :: Linux",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Utilities",
+  "Typing :: Typed",
+]
+
+[tool.poetry.scripts]
+sterces = "sterces.cli:main"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+pykeepass = "^4.1.1.post1"
+click = "^8.1.0"
+loguru = "^0.7.3"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+mypy = "^1.0"
+wemake-python-styleguide = "^1.0"
+flake8-pytest-style = ">=1.6,<3.0"
+doc8 = "^1.0"
+docutils = ">=0.19,<0.21"
+nitpick = "^0.35"
+safety = ">=2.3,<4.0"
+pytest = ">=7.4,<9.0"
+pytest-cov = "^6.0.0"
+isort = "^6.0"
+black = "^25.0"
+pytest-click = "^1.1.0"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^8.0"
+sphinx-autodoc-typehints = "^3.0"
+tomli = "^2.0"
+m2r2 = "^0.3.3.post2"
+
+[[tool.poetry.source]]
+name = "test-pypi"
+url = "https://test.pypi.org/simple/"
+priority = "supplemental"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.nitpick]
+style = "https://www.wtfo-guru.com/.well-known/nitpick-wtf-style.toml"

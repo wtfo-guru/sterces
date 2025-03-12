@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Store command",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "sterces.cli",
+            "args": ["--debug", "--verbose", "store"]
+        }
+    ]
+}
