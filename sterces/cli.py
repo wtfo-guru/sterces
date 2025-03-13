@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import NoReturn, Optional
 
 import click
+from loguru import logger
 from pykeepass.pykeepass import PyKeePass, create_database, debug_setup
 
 from sterces.app import app
@@ -16,6 +17,14 @@ CONTEXT_SETTINGS = types.MappingProxyType({"help_option_names": ["-h", "--help"]
 HOME = Path.home()
 DEFAULT_PASSWORD_FILE = HOME / ".sterces/.ssapeek"
 DEFAULT_DATABASE_FILE = HOME / ".sterces/db.kdbx"
+
+
+def _configure_logging(verbose: int) -> None:
+    logger.remove()  # Remove the default handler.
+    if verbose > 0:
+        logger.add(sys.stderr, level="INFO")
+    else:
+        logger.add(sys.stderr, level="WARNING")
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -54,6 +63,9 @@ DEFAULT_DATABASE_FILE = HOME / ".sterces/db.kdbx"
     default=0,
     help="increment verbosity level",
 )
+@click.option(
+    "--warn/--no-warn", default=True, help="Warn permissions flag (default True)"
+)
 @click.version_option(VERSION)
 def cli(
     debug: int,
@@ -62,11 +74,14 @@ def cli(
     transformed_key: Optional[str],
     passphrase_file: str,
     verbose: int,
+    warn: bool,
 ) -> int:
     """Command interface for a KeePass database."""
-    if debug:
+    if debug == 0:
+        _configure_logging(verbose)
+    elif debug > 1:
         debug_setup()
-    create, pwd = app.pre_flight(db, passphrase_file, key_file)
+    create, pwd = app.pre_flight(db, passphrase_file, key_file, warn)
     if create:
         pkobj = create_database(db, pwd, key_file, transformed_key)
         chmod = db
@@ -114,14 +129,14 @@ def store(
 
 @cli.command()
 @click.option("-a", "--add/--no-add", default=False, help="specify add action")
-@click.option("-n", "--name", type=str, help="specify name of group")
+@click.option("-p", "--path", type=str, help="specify group path")
 @click.option("-r", "--remove/--no-remove", default=False, help="specify remove action")
-@click.option("-p", "--parent", type=str, help="parent group (default root_group)")
-def group(add: bool, name: Optional[str], parent: Optional[str], remove: bool) -> NoReturn:
-    """Add or remove groups and list."""
+def group(add: bool, path: Optional[str], remove: bool) -> NoReturn:
+    """Add/remove groups and/or list."""
     if add and remove:
         raise ValueError("option add and remove are mutually exclusive")
-    sys.exit(app.group(add, name, parent, remove))
+    sys.exit(app.group(add, path, remove))
+
 
 if __name__ == "__main__":
     sys.exit(cli())  # pragma no cover

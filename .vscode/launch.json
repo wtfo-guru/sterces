@@ -13,7 +13,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "sterces.cli",
-            "args": ["--verbose", "group", "--list", "--add", "internet/email"]
+            "args": ["-d", "group", "--add", "--path", "/internet/email/gmail/qs5779"]
         }
     ]
 }
