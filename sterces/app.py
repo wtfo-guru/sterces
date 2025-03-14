@@ -1,6 +1,7 @@
 """Top level module app in package sterces."""
 
 import errno
+import getpass
 import os
 import re
 from pathlib import Path
@@ -10,7 +11,7 @@ from typing import Optional, Tuple
 import click
 from loguru import logger
 
-# from pykeepass.group import Group
+from pykeepass.group import Group
 from pykeepass.pykeepass import PyKeePass
 
 
@@ -53,47 +54,43 @@ class StercesApp:  # noqa: WPS214
         self._pkobj = pkobj
         self._chmod = chmod
 
-    def group(  # noqa: WPS231
-        self, add: bool, path: Optional[str], remove: bool
-    ) -> int:
+    def group(self, add: bool, path: Optional[str], remove: bool) -> int:
         if add:
-            if not path:
-                raise ValueError("Path is required for add action")
-            self._ensure_group(path)
+            self._option_required_for(path, "path", "add")
+            self._ensure_group(str(path))
         elif remove:
-            if not path:
-                raise ValueError("Path is required for remove action")
-            group = self.pko.find_groups(path=self._group_path(path))
+            self._option_required_for(path, "path", "remove")
+            group = self.pko.find_groups(path=self._group_path(str(path)))
             if group:
                 self.pko.delete_group(group)
+                self._dirty += 1
             else:
                 logger.warning("Group not found: {0}".format(path))
-        print(self.pko.groups)
+        click.echo(self.pko.groups)
         self._save()
         return 0
 
     def store(  # noqa: WPS211
         self,
-        group: Optional[str],
+        path: Optional[str],
         title: str,
-        username: Optional[str],
-        password: str,
-        url: Optional[str],
-        notes: Optional[str],
         expires: Optional[str],
         tags: Optional[list[str]],
-        otp,
+        **kwargs,
     ) -> int:
-        if group:
-            groups = self.pko.find_groups(name=group, first=False)
+        if path:
+            group = self._ensure_group(path)
         else:
             group = self.pko.root_group
         if self.debug:
-            click.echo("group: {0}".format(group))
+            if path:
+                click.echo("path: {0}".format(path))
             click.echo("title: {0}".format(title))
             if self.debug > 1:
-                click.echo("password: {0}".format(password))
-        logger.warning("Not Implemented yet!")
+                pwd = kwargs.get("password")
+                click.echo("password: {0}".format(pwd))
+
+        entry = self._pkobj.find_entries(group=group, title=title)
         return 0
 
     def pre_flight(
@@ -106,16 +103,27 @@ class StercesApp:  # noqa: WPS214
         with open(passphrase) as fd:
             return create, fd.readline().strip()
 
+    def _option_required_for(
+        self, option: Optional[str], name: str, action: str
+    ) -> None:
+        if not option:
+            raise ValueError(
+                "option {0} is required for {1} action".format(name, action)
+            )
+
     def _check_file(self, fn: str, warn: bool, missing_ok: bool) -> bool:
         DIR_MODE = r"rwx------$"
-        FILE_MODE = r"-rw-------$"
+        # FILE_MODE = r"-rw-------$"
         fp = Path(fn)
         exists = fp.exists()
-        if exists:
-            self._check_mode(fn, fp.stat().st_mode, FILE_MODE, warn)
-            self._check_mode(str(fp.parent), fp.parent.stat().st_mode, DIR_MODE, warn)
-        elif not missing_ok:
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), fn)
+        if not exists:
+            if not missing_ok:
+                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), fn)
+            if not fp.parent.exists():
+                raise FileNotFoundError(
+                    errno.ENOENT, os.strerror(errno.ENOENT), str(fp.parent)
+                )
+        self._check_mode(str(fp.parent), fp.parent.stat().st_mode, DIR_MODE, warn)  # noqa: WPS221
         return not exists
 
     def _check_mode(self, fn: str, mode: int, exp: str, warn: bool) -> None:
@@ -139,13 +147,12 @@ class StercesApp:  # noqa: WPS214
     def _group_path(self, path: str) -> list[str]:
         return path.strip("/").split("/")
 
-    def _ensure_group(self, path: str) -> None:
+    def _ensure_group(self, path: str) -> Group:
         parts = self._group_path(path)
-        print(parts)
         end = 1
         cur_grp = self.pko.root_group
         while True:
-            pl = parts[0:end]
+            pl = parts[0:end]  # noqa: WPS349
             found = self.pko.find_groups(path=pl)
             if found:
                 cur_grp = found[0]
@@ -157,6 +164,7 @@ class StercesApp:  # noqa: WPS214
             end += 1
             if end > len(parts):
                 break
+        return cur_grp
 
     def _group_exists(self, path: str) -> bool:
         groups = self.pko.find_groups(path=self._group_path(path))
@@ -166,6 +174,7 @@ class StercesApp:  # noqa: WPS214
         if self._dirty > 0:
             self.pko.save()
             self._dirty = 0
+            logger.debug("saved database")
 
 
 app = StercesApp()

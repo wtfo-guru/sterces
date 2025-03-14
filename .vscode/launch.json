@@ -6,14 +6,14 @@
             "type": "debugpy",
             "request": "launch",
             "module": "sterces.cli",
-            "args": ["-d", "-d", "--verbose", "store", "--title", "scrapeops-io-api-key"]
+            "args": ["-d", "-d", "--verbose", "store", "--title", "scrapeops-io-api-key", "--expires", "2025-03-14"]
         },
         {
             "name": "Group command",
             "type": "debugpy",
             "request": "launch",
             "module": "sterces.cli",
-            "args": ["-d", "group", "--add", "--path", "/internet/email/gmail/qs5779"]
+            "args": ["-d", "group", "--remove", "--path", "/internet/"]
         }
     ]
 }

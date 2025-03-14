@@ -20,3 +20,11 @@ def gdbx():
     if path.exists():
         path.unlink()
     return str(path)
+
+
+@pytest.fixture(scope="session")
+def sdbx():
+    path = Path("/tmp/store.kdbx")
+    if path.exists():
+        path.unlink()
+    return str(path)
