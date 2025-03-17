@@ -10,9 +10,20 @@ from typing import Optional, Tuple, Union
 
 import click
 from loguru import logger
-
 from pykeepass.group import Group
 from pykeepass.pykeepass import PyKeePass
+
+from sterces.constants import ADD, REMOVE
+
+# attributes
+USERNAME = "username"
+PASSWORD = "password"
+URL = "url"
+NOTES = "notes"
+EXPIRY = "expiry"
+TAGS = "tags"
+OTP = "otp"
+ATTRIBUTES = frozenset((USERNAME, PASSWORD, URL, NOTES, EXPIRY, TAGS, OTP))
 
 
 class StercesApp:  # noqa: WPS214
@@ -54,23 +65,26 @@ class StercesApp:  # noqa: WPS214
         self._pkobj = pkobj
         self._chmod = chmod
 
-    def group(self, add: bool, path: Optional[str], remove: bool) -> int:
-        if add:
-            self._option_required_for(path, "path", "add")
-            self._ensure_group(str(path))
-        elif remove:
-            self._option_required_for(path, "path", "remove")
-            group = self.pko.find_groups(path=self._group_path(str(path)))
-            if group:
-                self.pko.delete_group(group)
-                self._dirty += 1
+    def group(self, path: Optional[str], action: str) -> int:
+        if path:
+            if action == ADD:
+                self._option_required_for(path, "path", ADD)
+                self._ensure_group(str(path))
+            elif action == REMOVE:
+                self._option_required_for(path, "path", REMOVE)
+                group = self.pko.find_groups(path=self._group_path(str(path)))
+                if group:
+                    self.pko.delete_group(group)
+                    self._dirty += 1
+                else:
+                    logger.warning("Group not found: {0}".format(path))
             else:
-                logger.warning("Group not found: {0}".format(path))
+                logger.warning("Invalid action: {0}".format(action))
         click.echo(self.pko.groups)
         self._save()
         return 0
 
-    def store(  # noqa: WPS211
+    def store(  # noqa: WPS210, WPS211
         self,
         path: str,
         expiry: Optional[datetime],
@@ -79,22 +93,22 @@ class StercesApp:  # noqa: WPS214
     ) -> int:
         keywords: list[str] = tags if tags else []
         entries = self.pko.find_entries(path=path)
-        if not entries:
-            group_path, title = self._entry_path(path)
-            group = self._ensure_group(group_path)
-            entry = self.pko.add_entry(
-                group,
-                title,
-                kwargs.pop("username", "undef"),
-                kwargs.pop("password", None),
-                kwargs.pop("url", None),
-                kwargs.pop("notes", None),
-                expiry,
-                keywords,
-                kwargs.pop("otp", None),
-            )
-        else:
-            entry = entries[0]
+        if entries:
+            logger.warning("Entry {0} already exists".format(path))
+            return 1
+        group_path, title = self._entry_path(path)
+        group = self._ensure_group(group_path)
+        entry = self.pko.add_entry(
+            group,
+            title,
+            kwargs.pop(USERNAME, "undef"),
+            kwargs.pop(PASSWORD, None),
+            kwargs.pop(URL, None),
+            kwargs.pop(NOTES, None),
+            expiry,
+            keywords,
+            kwargs.pop(OTP, None),
+        )
         print(entry)
         return 0
 

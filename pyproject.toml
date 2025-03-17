@@ -55,6 +55,7 @@ isort = "^6.0"
 black = "^25.0"
 pytest-click = "^1.1.0"
 testfixtures = "^8.3.0"
+types-dateparser = "^1.2.0.20250208"
 
 [tool.poetry.group.docs]
 optional = true
