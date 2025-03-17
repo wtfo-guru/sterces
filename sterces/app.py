@@ -11,9 +11,11 @@ from typing import Optional, Tuple, Union
 import click
 from loguru import logger
 from pykeepass.group import Group
+from pykeepass.entry import Entry
 from pykeepass.pykeepass import PyKeePass
 
 from sterces.constants import ADD, REMOVE
+from sterces.foos import str_to_date
 
 # attributes
 USERNAME = "username"
@@ -109,7 +111,38 @@ class StercesApp:  # noqa: WPS214
             keywords,
             kwargs.pop(OTP, None),
         )
-        print(entry)
+        self._dirty += 1
+        self._print_entry(entry)
+        self._save()
+        return 0
+
+    def update(
+        self,
+        path: str,
+        **kwargs,
+    ) -> int:
+        entries = self.pko.find_entries(path=path)
+        if not entries:
+            logger.error("Entry {0} does not exist".format(path))
+            return 1
+        entry = entries[0]
+        for key, valor in kwargs.items():
+            if key == "expires":
+                if valor is None:
+                    entry.expires = False
+                else:
+                    expiry = str_to_date(valor)
+                    if expiry is None:
+                        raise ValueError("Invalid date time string: {0}".format(expires))
+                    entry.expiry_time = expiry
+                    entry.expires = True
+            elif key == TAGS:
+                entry.tags = valor.split(",")
+            else:
+                eval("entry.{0} = valor".format(key))
+        self._dirty += 1
+        self._print_entry(entry)
+        self._save()
         return 0
 
     def pre_flight(
@@ -121,6 +154,32 @@ class StercesApp:  # noqa: WPS214
             self._check_file(key_file, warn, missing_ok=True)
         with open(passphrase) as fd:
             return create, fd.readline().strip()
+
+    def _print_entry(self, entry: Entry, mask: bool = True) -> None:
+        ed: dict[str, str] = {}
+        ed["path"] = entry.path
+        ed["title"] = entry.title
+        ed["username"] = entry.username
+        if mask:
+            masked = ""
+            cnt = len(entry.password)
+            while cnt > 0:
+                masked = masked + "*"
+                cnt -= 1
+            ed["password"] = masked
+        else:
+            ed["password"] = entry.password
+        if entry.tags:
+            ed["tags"] = ",".join(entry.tags)
+        if entry.url:
+            ed["url"] = entry.url
+        if entry.notes:
+            ed["notes"] = entry.notes
+        if entry.expires:
+            ed["expiry"] = entry.expiry_time.strftime("%Y-%m-%d %H:%M:%S")
+        if entry.otp:
+            ed["otp"] = entry.otp
+        click.echo(ed)
 
     def _option_required_for(
         self, option: Optional[str], name: str, action: str

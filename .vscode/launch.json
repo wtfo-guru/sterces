@@ -1,32 +1,51 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Store command",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "sterces.cli",
-            "justMyCode": false,
-            "args": [
-                "-d",
-                "-d",
-                "--verbose",
-                "store",
-                "--path",
-                "/test1",
-                "-p",
-                "passw0rd",
-                "--expires",
-                "2025-03-14"
-            ]
-        },
-        {
-            "name": "Group command",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "sterces.cli",
-            "justMyCode": false,
-            "args": ["-d", "group", "--remove", "--path", "/internet/"]
-        }
+      {
+          "name": "Entry update command",
+          "type": "debugpy",
+          "request": "launch",
+          "module": "sterces.cli",
+          "justMyCode": false,
+          "args": [
+              "-d",
+              "--verbose",
+              "entry",
+              "update",
+              "--attrs",
+              "username",
+              "--path",
+              "/test/test1",
+              "-u",
+              "joeblow",
+          ]
+      },
+      {
+          "name": "Entry add command",
+          "type": "debugpy",
+          "request": "launch",
+          "module": "sterces.cli",
+          "justMyCode": false,
+          "args": [
+              "-d",
+              "--verbose",
+              "entry",
+              "add",
+              "--path",
+              "/test/test1",
+              "-p",
+              "passw0rd",
+              "--expires",
+              "2026-03-14"
+          ]
+      },
+      {
+          "name": "Group command",
+          "type": "debugpy",
+          "request": "launch",
+          "module": "sterces.cli",
+          "justMyCode": false,
+          "args": ["-d", "group", "--remove", "--path", "/internet/"]
+      }
     ]
 }

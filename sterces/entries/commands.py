@@ -8,9 +8,9 @@ import click
 import pyotp
 from loguru import logger
 
-from sterces.app import app
+from sterces.app import app, ATTRIBUTES
 from sterces.constants import CONTEXT_SETTINGS
-from sterces.foos import add_arg_if, str_to_date
+from sterces.foos import add_arg, add_arg_if, str_to_date
 
 
 @click.group()
@@ -51,7 +51,7 @@ def add(  # noqa: WPS231, C901
         parsed = pyotp.parse_uri(otp)
         if parsed is None:
             raise ValueError("Invalid otp uri: {0}".format(otp))
-    if str(password) == "prompt":
+    if not password:
         password = getpass.getpass()
     add_arg_if(sgrawk, "notes", notes)
     add_arg_if(sgrawk, "otp", otp)
@@ -91,7 +91,12 @@ def update(
     username: Optional[str],
 ) -> NoReturn:
     """Update specified attributes of entry."""
-    logger.warning("Command entry update not implemented yet.")
+    sgrawk: dict[str, str] = {}
+    for attr in attrs:
+        if attr not in ATTRIBUTES:
+            raise ValueError("Invalid attribute: {0} Must be one of: {1}".format(attr,",".join(ATTRIBUTES)))
+        add_arg(sgrawk, attr, eval(attr))
+    app.update(path, **sgrawk)
     sys.exit(0)
 
 

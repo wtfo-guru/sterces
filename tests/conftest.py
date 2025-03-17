@@ -1,5 +1,6 @@
 """Test level module test_cli for dailylog."""
 
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -20,6 +21,13 @@ def gdbx():
     if path.exists():
         path.unlink()
     return str(path)
+
+
+@pytest.fixture(scope="session")
+def expiry():
+    ts = int(datetime.now(timezone.utc).timestamp())
+    ts + 864000 # add 10 days
+    return datetime.fromtimestamp(ts, timezone.utc).strftime("%m/%d/%Y %H:%M:%S")
 
 
 @pytest.fixture(scope="session")
