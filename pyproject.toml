@@ -54,6 +54,7 @@ pytest-cov = "^6.0.0"
 isort = "^6.0"
 black = "^25.0"
 pytest-click = "^1.1.0"
+testfixtures = "^8.3.0"
 
 [tool.poetry.group.docs]
 optional = true

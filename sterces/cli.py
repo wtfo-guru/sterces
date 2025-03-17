@@ -1,6 +1,7 @@
 """Top level module cli from package sterces."""
 
 import sys
+import getpass
 import dateparser
 import pyotp
 import types
@@ -110,8 +111,7 @@ def delete() -> NoReturn:
 @click.option("-n", "--notes", type=str, help="specify notes")
 @click.option("-o", "--otp", type=str, help="specify notes")
 @click.option("-p", "--password", type=str, help="specify password")
-@click.option("-P", "--path", type=str, help="specify path of group (default root_group)")
-@click.option("-t", "--title", type=str, required=True, help="specify title")
+@click.option("-P", "--path", type=str, required=True, help="specify path of entry")
 @click.option("-T", "--tags", type=str, multiple=True, help="specify tags")
 @click.option("-u", "--username", type=str, help="specify username")
 @click.option("--url", type=str, help="specify url")
@@ -120,33 +120,33 @@ def store(
     notes: Optional[str],
     otp: Optional[str],
     password: Optional[str],
-    path: Optional[str],
-    title: str,
+    path: str,
     tags: Optional[list[str]],
     url: Optional[str],
     username: Optional[str],
 ) -> NoReturn:
     """Add or update an entry."""
     sgrawk: dict[str,str] = {}
-    if not title:
-        raise ValueError("Title cannot be empty")
+    if not path:
+        raise ValueError("Path option cannot be empty")
     if expires:
         expiry = _str_to_date(expires)
         if expiry is None:
             raise ValueError("Invalid date time string: {0}".format(expires))
+    else:
+        expiry = None
     if otp:
         parsed = pyotp.parse_uri(otp)
         if parsed is None:
             raise ValueError("Invalid otp uri: {0}".format(otp))
-    if password is not None and password == 'prompt':
-        if not password:
-            password = getpass.getpass()
+    if str(password) == 'prompt':
+        password = getpass.getpass()
     _add_arg_if(sgrawk, "notes", notes)
     _add_arg_if(sgrawk, "otp", otp)
     _add_arg_if(sgrawk, "password", password)
     _add_arg_if(sgrawk, "url", url)
     _add_arg_if(sgrawk, "username", username)
-    app.store(path, title, expires, tags, **sgrawk)
+    app.store(path, expiry, tags, **sgrawk)
     sys.exit(0)
 
 

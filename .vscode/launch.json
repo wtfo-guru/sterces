@@ -6,13 +6,26 @@
             "type": "debugpy",
             "request": "launch",
             "module": "sterces.cli",
-            "args": ["-d", "-d", "--verbose", "store", "--title", "scrapeops-io-api-key", "--expires", "2025-03-14"]
+            "justMyCode": false,
+            "args": [
+                "-d",
+                "-d",
+                "--verbose",
+                "store",
+                "--path",
+                "/test1",
+                "-p",
+                "passw0rd",
+                "--expires",
+                "2025-03-14"
+            ]
         },
         {
             "name": "Group command",
             "type": "debugpy",
             "request": "launch",
             "module": "sterces.cli",
+            "justMyCode": false,
             "args": ["-d", "group", "--remove", "--path", "/internet/"]
         }
     ]

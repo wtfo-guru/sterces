@@ -1,12 +1,12 @@
 """Top level module app in package sterces."""
 
 import errno
-import getpass
 import os
 import re
+from datetime import datetime
 from pathlib import Path
 from stat import filemode
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import click
 from loguru import logger
@@ -72,25 +72,30 @@ class StercesApp:  # noqa: WPS214
 
     def store(  # noqa: WPS211
         self,
-        path: Optional[str],
-        title: str,
-        expires: Optional[str],
+        path: str,
+        expiry: Optional[datetime],
         tags: Optional[list[str]],
         **kwargs,
     ) -> int:
-        if path:
-            group = self._ensure_group(path)
+        keywords: list[str] = tags if tags else []
+        entries = self.pko.find_entries(path=path)
+        if not entries:
+            group_path, title = self._entry_path(path)
+            group = self._ensure_group(group_path)
+            entry = self.pko.add_entry(
+                group,
+                title,
+                kwargs.pop("username", "undef"),
+                kwargs.pop("password", None),
+                kwargs.pop("url", None),
+                kwargs.pop("notes", None),
+                expiry,
+                keywords,
+                kwargs.pop("otp", None),
+            )
         else:
-            group = self.pko.root_group
-        if self.debug:
-            if path:
-                click.echo("path: {0}".format(path))
-            click.echo("title: {0}".format(title))
-            if self.debug > 1:
-                pwd = kwargs.get("password")
-                click.echo("password: {0}".format(pwd))
-
-        entry = self._pkobj.find_entries(group=group, title=title)
+            entry = entries[0]
+        print(entry)
         return 0
 
     def pre_flight(
@@ -123,7 +128,9 @@ class StercesApp:  # noqa: WPS214
                 raise FileNotFoundError(
                     errno.ENOENT, os.strerror(errno.ENOENT), str(fp.parent)
                 )
-        self._check_mode(str(fp.parent), fp.parent.stat().st_mode, DIR_MODE, warn)  # noqa: WPS221
+        self._check_mode(
+            str(fp.parent), fp.parent.stat().st_mode, DIR_MODE, warn
+        )  # noqa: WPS221
         return not exists
 
     def _check_mode(self, fn: str, mode: int, exp: str, warn: bool) -> None:
@@ -147,11 +154,19 @@ class StercesApp:  # noqa: WPS214
     def _group_path(self, path: str) -> list[str]:
         return path.strip("/").split("/")
 
-    def _ensure_group(self, path: str) -> Group:
-        parts = self._group_path(path)
+    def _entry_path(self, path: str) -> Tuple[list[str], str]:
+        group_path = self._group_path(path)
+        title = group_path.pop()
+        return group_path, title
+
+    def _ensure_group(self, path: Union[str, list[str]]) -> Group:
+        if isinstance(path, str):
+            parts = self._group_path(path)
+        else:
+            parts = path.copy()
         end = 1
         cur_grp = self.pko.root_group
-        while True:
+        while parts:
             pl = parts[0:end]  # noqa: WPS349
             found = self.pko.find_groups(path=pl)
             if found:
