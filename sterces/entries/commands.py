@@ -8,7 +8,7 @@ import click
 import pyotp
 from loguru import logger
 
-from sterces.app import app, ATTRIBUTES
+from sterces.app import ATTRIBUTES, app
 from sterces.constants import CONTEXT_SETTINGS
 from sterces.foos import add_arg, add_arg_if, str_to_date
 
@@ -91,10 +91,14 @@ def update(
     username: Optional[str],
 ) -> NoReturn:
     """Update specified attributes of entry."""
-    sgrawk: dict[str, str] = {}
+    sgrawk: dict[str, Optional[str]] = {}
     for attr in attrs:
         if attr not in ATTRIBUTES:
-            raise ValueError("Invalid attribute: {0} Must be one of: {1}".format(attr,",".join(ATTRIBUTES)))
+            raise ValueError(
+                "Invalid attribute: {0} Must be one of: {1}".format(
+                    attr, ",".join(ATTRIBUTES)
+                )
+            )
         add_arg(sgrawk, attr, eval(attr))
     app.update(path, **sgrawk)
     sys.exit(0)
@@ -112,7 +116,7 @@ def remove(path: str) -> NoReturn:
 @click.option("-P", "--path", type=str, help="specify path of entry")
 def show(path: Optional[str]) -> NoReturn:
     """Show specified entry or all entries if path not specified."""
-    logger.warning("Command entry show not implemented yet.")
+    app.show(path)
     sys.exit(0)
 
 

@@ -1,5 +1,7 @@
-import testfixtures
 from datetime import timezone
+
+import testfixtures
+
 from sterces import cli
 from sterces.foos import str_to_date
 
@@ -61,14 +63,16 @@ def test_entry_add(cli_runner, sdbx: str, ppfn: str, expiry: str):
             "-p",
             "passw0rd",
             "--expires",
-            expiry
+            expiry,
         ],
     )
     assert fruit.exit_code == 0
     assert not fruit.exception
-    dt = str_to_date(expiry).astimezone(timezone.utc)
+    dt = str_to_date(expiry).astimezone(timezone.utc)  # type: ignore [union-attr]
     md = dt.strftime("%Y-%m-%d %H:%M:%S")
-    match: str = "'path': ['test', 'test1'], 'title': 'test1', 'username': 'undef', 'password': '********', 'expiry': '{0}'".format(md)
+    match: str = (
+        "'path': ['test', 'test1'], 'title': 'test1', 'username': 'undef', 'password': '********', 'expiry': '{0}'".format(
+            md
+        )
+    )
     assert match in fruit.output
-
-

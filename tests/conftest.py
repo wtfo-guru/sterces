@@ -26,7 +26,7 @@ def gdbx():
 @pytest.fixture(scope="session")
 def expiry():
     ts = int(datetime.now(timezone.utc).timestamp())
-    ts + 864000 # add 10 days
+    ts + 864000  # add 10 days
     return datetime.fromtimestamp(ts, timezone.utc).strftime("%m/%d/%Y %H:%M:%S")
 
 

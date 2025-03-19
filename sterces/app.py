@@ -10,8 +10,8 @@ from typing import Optional, Tuple, Union
 
 import click
 from loguru import logger
-from pykeepass.group import Group
 from pykeepass.entry import Entry
+from pykeepass.group import Group
 from pykeepass.pykeepass import PyKeePass
 
 from sterces.constants import ADD, REMOVE
@@ -74,7 +74,7 @@ class StercesApp:  # noqa: WPS214
                 self._ensure_group(str(path))
             elif action == REMOVE:
                 self._option_required_for(path, "path", REMOVE)
-                group = self.pko.find_groups(path=self._group_path(str(path)))
+                group = self.pko.find_groups(path=self._str_to_path(str(path)))
                 if group:
                     self.pko.delete_group(group)
                     self._dirty += 1
@@ -94,9 +94,9 @@ class StercesApp:  # noqa: WPS214
         **kwargs,
     ) -> int:
         keywords: list[str] = tags if tags else []
-        entries = self.pko.find_entries(path=path)
-        if entries:
-            logger.warning("Entry {0} already exists".format(path))
+        entry = self.pko.find_entries(path=self._str_to_path(path))
+        if entry:
+            logger.error("Entry {0} already exists".format(path))
             return 1
         group_path, title = self._entry_path(path)
         group = self._ensure_group(group_path)
@@ -116,16 +116,15 @@ class StercesApp:  # noqa: WPS214
         self._save()
         return 0
 
-    def update(
+    def update(  # noqa: WPS231, C901
         self,
         path: str,
         **kwargs,
     ) -> int:
-        entries = self.pko.find_entries(path=path)
-        if not entries:
+        entry = self.pko.find_entries(path=self._str_to_path(path))
+        if not entry:
             logger.error("Entry {0} does not exist".format(path))
             return 1
-        entry = entries[0]
         for key, valor in kwargs.items():
             if key == "expires":
                 if valor is None:
@@ -133,13 +132,13 @@ class StercesApp:  # noqa: WPS214
                 else:
                     expiry = str_to_date(valor)
                     if expiry is None:
-                        raise ValueError("Invalid date time string: {0}".format(expires))
+                        raise ValueError("Invalid date time string: {0}".format(expiry))
                     entry.expiry_time = expiry
                     entry.expires = True
             elif key == TAGS:
                 entry.tags = valor.split(",")
             else:
-                eval("entry.{0} = valor".format(key))
+                exec("entry.{0} = valor".format(key))
         self._dirty += 1
         self._print_entry(entry)
         self._save()
@@ -155,7 +154,16 @@ class StercesApp:  # noqa: WPS214
         with open(passphrase) as fd:
             return create, fd.readline().strip()
 
-    def _print_entry(self, entry: Entry, mask: bool = True) -> None:
+    def show(self, path: Optional[str]) -> int:
+        if path:
+            entries = self.pko.find_entries(path=path)
+        else:
+            entries = self.pko.entries
+        for entry in entries:
+            self._print_entry(entry)
+        return 0
+
+    def _print_entry(self, entry: Entry, mask: bool = True) -> None:  # noqa: C901
         ed: dict[str, str] = {}
         ed["path"] = entry.path
         ed["title"] = entry.title
@@ -164,7 +172,7 @@ class StercesApp:  # noqa: WPS214
             masked = ""
             cnt = len(entry.password)
             while cnt > 0:
-                masked = masked + "*"
+                masked = masked + "*"  # noqa: WPS336
                 cnt -= 1
             ed["password"] = masked
         else:
@@ -224,17 +232,17 @@ class StercesApp:  # noqa: WPS214
                 "{0} permission are unsafe for '{1}' recommend '{2}'".format(pt, fn, rr)
             )
 
-    def _group_path(self, path: str) -> list[str]:
+    def _str_to_path(self, path: str) -> list[str]:
         return path.strip("/").split("/")
 
     def _entry_path(self, path: str) -> Tuple[list[str], str]:
-        group_path = self._group_path(path)
+        group_path = self._str_to_path(path)
         title = group_path.pop()
         return group_path, title
 
     def _ensure_group(self, path: Union[str, list[str]]) -> Group:
         if isinstance(path, str):
-            parts = self._group_path(path)
+            parts = self._str_to_path(path)
         else:
             parts = path.copy()
         end = 1
@@ -243,7 +251,7 @@ class StercesApp:  # noqa: WPS214
             pl = parts[0:end]  # noqa: WPS349
             found = self.pko.find_groups(path=pl)
             if found:
-                cur_grp = found[0]
+                cur_grp = found
                 continue
             logger.info("creating group '{0}'".format(pl[-1]))
             cur_grp = self.pko.add_group(cur_grp, pl[-1])
@@ -255,7 +263,7 @@ class StercesApp:  # noqa: WPS214
         return cur_grp
 
     def _group_exists(self, path: str) -> bool:
-        groups = self.pko.find_groups(path=self._group_path(path))
+        groups = self.pko.find_groups(path=self._str_to_path(path))
         return len(groups) == 1
 
     def _save(self) -> None:

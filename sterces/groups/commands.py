@@ -29,6 +29,6 @@ def remove(path: str) -> NoReturn:
 
 
 @group.command()
-def show(path: str) -> NoReturn:
+def show() -> NoReturn:
     """Show groups."""
     sys.exit(app.group(None, SHOW))

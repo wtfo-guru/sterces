@@ -15,7 +15,9 @@ def add_arg_if(sgrawk: dict[str, str], key: str, valor: Optional[str]) -> None:
         sgrawk[key] = valor
 
 
-def add_arg(sgrawk: dict[str, str], key: str, valor: Optional[Union[str,list[str]]]) -> None:
+def add_arg(
+    sgrawk: dict[str, Optional[str]], key: str, valor: Optional[Union[str, list[str]]]
+) -> None:
     if isinstance(valor, list):
         sgrawk[key] = ", ".join(valor)
         return
