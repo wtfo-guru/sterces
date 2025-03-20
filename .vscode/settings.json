@@ -4,6 +4,8 @@
         "gdbx",
         "kdbx",
         "keepass",
+        "kpdb",
+        "kpobj",
         "pkobj",
         "ppfn",
         "pykeepass",
@@ -11,5 +13,10 @@
         "sgrawk",
         "ssapeek",
         "strerror"
-    ]
+    ],
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

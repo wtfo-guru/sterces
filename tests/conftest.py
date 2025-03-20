@@ -1,38 +1,27 @@
-"""Test level module test_cli for dailylog."""
+"""Tests level module conftest for package sterces."""
 
-from datetime import datetime, timezone
-from pathlib import Path
+from shutil import rmtree
+from tempfile import mkdtemp
+from typing import Optional
 
 import pytest
+from pykeepass.pykeepass import PyKeePass
+
+from sterces.db import StercesDatabase
 
 
 @pytest.fixture(scope="session")
-def ppfn():
-    """Return name of test cache file."""
-    path = Path("/tmp/esarhpssap")
-    with open(path, "w") as fd:
-        fd.write("492434cfcb0446f7152e34f5e8ba4e0e\n")
-    return str(path)
+def db():
+    td = mkdtemp()
+    ppf = "{0}/.ssapeek".format(td)
+    dbf = "{0}/db.kdbx".format(td)
+    with open(ppf, "w") as fd:
+        fd.write("abc1234567890def\n")
+    database: Optional[PyKeePass] = StercesDatabase(
+        db_fn=str(dbf), pwd_fn=str(ppf), warn=False
+    )
 
+    yield database
 
-@pytest.fixture(scope="session")
-def gdbx():
-    path = Path("/tmp/group.kdbx")
-    if path.exists():
-        path.unlink()
-    return str(path)
-
-
-@pytest.fixture(scope="session")
-def expiry():
-    ts = int(datetime.now(timezone.utc).timestamp())
-    ts + 864000  # add 10 days
-    return datetime.fromtimestamp(ts, timezone.utc).strftime("%m/%d/%Y %H:%M:%S")
-
-
-@pytest.fixture(scope="session")
-def sdbx():
-    path = Path("/tmp/store.kdbx")
-    if path.exists():
-        path.unlink()
-    return str(path)
+    database = None
+    rmtree(td)

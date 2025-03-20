@@ -33,7 +33,6 @@ sterces = "sterces.cli:main"
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
 pykeepass = "^4.1.1.post1"
-click = "^8.1.0"
 loguru = "^0.7.3"
 dateparser = "^1.2.1"
 pyotp = "^2.9.0"
