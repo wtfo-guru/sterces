@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "sterces"
-version = "0.1.0"
+version = "0.1.0-dev0"
 description = "Command line interface for pykeepass"
 license = "MIT"
 authors = ["Quien Sabe <qs5579@mail.com>"]
 readme = "README.md"
 
 homepage = "https://github.com/wtfo-guru/sterces"
-documentation = "https://python-sterces.readthedocs.io/en/stable"
+documentation = "https://sterces.readthedocs.io/en/stable"
 
 keywords = []
 
@@ -55,6 +55,7 @@ black = "^25.0"
 pytest-click = "^1.1.0"
 testfixtures = "^8.3.0"
 types-dateparser = "^1.2.0.20250208"
+flake8-docstrings = "^1.7.0"
 
 [tool.poetry.group.docs]
 optional = true

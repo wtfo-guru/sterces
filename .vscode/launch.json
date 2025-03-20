@@ -1,51 +1,15 @@
 {
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-      {
-          "name": "Entry update command",
-          "type": "debugpy",
-          "request": "launch",
-          "module": "sterces.cli",
-          "justMyCode": false,
-          "args": [
-              "-d",
-              "--verbose",
-              "entry",
-              "update",
-              "--attrs",
-              "username",
-              "--path",
-              "/test/test1",
-              "-u",
-              "joeblow",
-          ]
-      },
-      {
-          "name": "Entry add command",
-          "type": "debugpy",
-          "request": "launch",
-          "module": "sterces.cli",
-          "justMyCode": false,
-          "args": [
-              "-d",
-              "--verbose",
-              "entry",
-              "add",
-              "--path",
-              "/test/test1",
-              "-p",
-              "passw0rd",
-              "--expires",
-              "2026-03-14"
-          ]
-      },
-      {
-          "name": "Group command",
-          "type": "debugpy",
-          "request": "launch",
-          "module": "sterces.cli",
-          "justMyCode": false,
-          "args": ["-d", "group", "--remove", "--path", "/internet/"]
-      }
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        }
     ]
 }

@@ -1,22 +1,15 @@
 {
     "cSpell.words": [
-        "ENOENT",
-        "gdbx",
+        "joeblow",
         "kdbx",
-        "keepass",
         "kpdb",
         "kpobj",
-        "pkobj",
-        "ppfn",
+        "passw",
         "pykeepass",
-        "sdbx",
-        "sgrawk",
-        "ssapeek",
-        "strerror"
+        "ssapeek"
     ],
-    "python.testing.pytestArgs": [
-        "tests"
-    ],
+    "python.testing.pytestArgs": [],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "autoDocstring.docstringFormat": "sphinx"
 }
