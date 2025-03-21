@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-VERSION = "0.1.0-dev0"
+VERSION = "0.1.0-dev1"
 
 # actions
 ADD = "add"

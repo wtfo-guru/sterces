@@ -8,7 +8,7 @@ from loguru import logger
 from pykeepass.pykeepass import PyKeePass
 
 from sterces.constants import ADD, REMOVE, VERSION
-from sterces.db import ENTRY_NOT_EXIST
+from sterces.db import ATTRIBUTES, ENTRY_NOT_EXIST
 
 ENTRY_TEST_UNO = "/test/test1"
 ENTRY_TEST_DOS = "/test/test2"
@@ -62,6 +62,24 @@ def test_entry_add(db: PyKeePass, expiry: datetime, capsys):
         )
     )
     assert match in out
+
+
+def test_entry_lookup(db: PyKeePass, expiry: datetime, caplog):
+    """Test entry add."""
+    attrs = {
+        "username": "undef",
+        "password": "passw0rd",
+        "tags": "test,uno",
+        "expiry": expiry.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    invalid = "invalid"
+    db.lookup(ENTRY_TEST_UNO, invalid)
+    for key, valor in attrs.items():
+        assert db.lookup(ENTRY_TEST_UNO, key) == valor
+    match = "Invalid attribute '{0}' not one of ({1}).".format(
+        invalid, ",".join(ATTRIBUTES)
+    )
+    assert match in caplog.text
 
 
 def test_entry_add_dup(db: PyKeePass, expiry: datetime, capsys, caplog):

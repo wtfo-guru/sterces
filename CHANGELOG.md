@@ -10,4 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0-dev0] - 2025-03-21
 
+### Added
+
+- lookup method with test
+
+## [0.1.0-dev0] - 2025-03-20
+
 - _First release._

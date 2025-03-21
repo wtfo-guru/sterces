@@ -144,6 +144,38 @@ class StercesDatabase:
         self._save()
         return 0
 
+    def lookup(self, path: str, attr: str) -> Optional[str]:  # noqa: WPS231
+        """Return the value of the attribute.
+
+        :param path: path of the entry
+        :type path: str
+        :param attr: attribute to lookup
+        :type attr: str
+        :return: value of found attribute or None
+        :rtype: Optional[str]
+        """
+        if attr in ATTRIBUTES:
+            entry = self.kpo.find_entries(path=self._str_to_path(path))
+            if entry:
+                if attr == TAGS:
+                    return ",".join(entry.tags)
+                elif attr == EXPIRY:
+                    return (
+                        entry.expiry_time.strftime("%Y-%m-%d %H:%M:%S")
+                        if entry.expires
+                        else None
+                    )
+                else:
+                    return eval("entry.{0}".format(attr))
+            logger.error(ENTRY_NOT_EXIST.format(path))
+        else:
+            logger.error(
+                "Invalid attribute '{0}' not one of ({1}).".format(
+                    attr, ",".join(ATTRIBUTES)
+                )
+            )
+        return None
+
     def remove(self, path: str) -> int:
         """Remove an entry.
 

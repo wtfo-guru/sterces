@@ -2,6 +2,7 @@ SHELL:=/usr/bin/env bash
 
 PROJECT_NAME = $(shell head -10 pyproject.toml|grep ^name | awk '{print $$NF}'|tr -d '"' | tr '-' '_')
 PROJECT_VERSION = $(shell head -10 pyproject.toml|grep ^version | awk '{print $$NF}'|tr -d '"')
+WHEEL_VERSION = $(shell echo $(PROJECT_VERSION)|sed -e 's/-dev/.dev/')
 BUMP_VERSION = $(shell grep ^current_version .bumpversion.cfg | awk '{print $$NF}')
 CONST_VERSION = $(shell grep ^VERSION $(PROJECT_NAME)/constants.py | awk '{print $$NF}'|tr -d '"')
 TEST_MASK ?= tests/*.py
@@ -17,6 +18,7 @@ update:
 vars:
 	@echo "PROJECT_NAME: $(PROJECT_NAME)"
 	@echo "PROJECT_VERSION: $(PROJECT_VERSION)"
+	@echo "WHEEL_VERSION: $(WHEEL_VERSION)"
 	@echo "BUMP_VERSION: $(BUMP_VERSION)"
 	@echo "CONST_VERSION: $(CONST_VERSION)"
 
@@ -76,7 +78,7 @@ ghtest: lint package unit
 .PHONY: build
 build: version-sanity safety clean-build test
 	poetry build
-	sync-wheels.sh dist/$(PROJECT_NAME)-$(PROJECT_VERSION)-py3-none-any.whl $(WHEELS)
+	sync-wheels.sh dist/$(PROJECT_NAME)-$(WHEEL_VERSION)-py3-none-any.whl $(WHEELS)
 #	manage-tag.sh -u v$(PROJECT_VERSION)
 
 .PHONY: docs
