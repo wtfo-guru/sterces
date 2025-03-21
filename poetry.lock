@@ -776,6 +776,25 @@ files = [
 flake8-plugin-utils = ">=1.3.2,<2.0.0"
 
 [[package]]
+name = "flake8-rst-docstrings"
+version = "0.3.0"
+description = "Python docstring reStructuredText (RST) validator for flake8"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "flake8-rst-docstrings-0.3.0.tar.gz", hash = "sha256:d1ce22b4bd37b73cd86b8d980e946ef198cfcc18ed82fedb674ceaa2f8d1afa4"},
+    {file = "flake8_rst_docstrings-0.3.0-py3-none-any.whl", hash = "sha256:f8c3c6892ff402292651c31983a38da082480ad3ba253743de52989bdc84ca1c"},
+]
+
+[package.dependencies]
+flake8 = ">=3"
+pygments = "*"
+restructuredtext-lint = "*"
+
+[package.extras]
+develop = ["build", "twine"]
+
+[[package]]
 name = "flatten-dict"
 version = "0.4.2"
 description = "A flexible utility for flattening and unflattening dict-like objects in Python."
@@ -2671,4 +2690,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "629d900e6525f02c6023bdc171125896ab998ce2834e85d598a411777e2cd013"
+content-hash = "f41c02b4100037cfa9ddc4a83e82301af9b776695fbd22d97045a778571183f7"

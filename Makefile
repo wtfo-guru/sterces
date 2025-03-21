@@ -63,8 +63,12 @@ publish-test: version-sanity clean-build test
 safety:
 	poetry run safety scan --full-report
 
+.PHONY: nitpick
+nitpick:
+	poetry run nitpick -p . check
+
 .PHONY: test
-test: lint package safety unit
+test: nitpick lint package safety unit
 
 .PHONY: ghtest
 ghtest: lint package unit
