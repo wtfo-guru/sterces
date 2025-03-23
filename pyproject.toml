@@ -65,7 +65,7 @@ optional = true
 sphinx = "^8.0"
 sphinx-autodoc-typehints = "^3.0"
 tomli = "^2.0"
-m2r2 = "^0.3.3.post2"
+sphinx-mdinclude = "^0.6.2"
 
 [[tool.poetry.source]]
 name = "test-pypi"

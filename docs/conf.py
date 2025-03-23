@@ -28,7 +28,7 @@ def _get_project_meta():
 
 pkg_meta = _get_project_meta()
 project = str(pkg_meta["name"])
-copyright = "2022, wtfo-guru"  # noqa: WPS125
+copyright = "2025, wtfo-guru"  # noqa: WPS125
 author = "wtfo-guru"
 
 # The short X.Y version
@@ -55,7 +55,7 @@ extensions = [
     # Used to write beautiful docstrings:
     "sphinx.ext.napoleon",
     # Used to include .md files:
-    "m2r2",
+    "sphinx_mdinclude",
     # Used to insert typehints into the final docs:
     "sphinx_autodoc_typehints",
 ]
