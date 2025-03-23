@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sterces"
-version = "0.1.0-dev2"
+version = "0.1.0"
 description = "Command line interface for pykeepass"
 license = "MIT"
 authors = ["Quien Sabe <qs5579@mail.com>"]
