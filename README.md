@@ -1,6 +1,6 @@
 # sterces
 
-[![Build Status](https://github.com/wtfo-guru/sterces/workflows/Sterces/badge.svg?branch=main&event=push)](https://github.com/wtfo-guru/sterces/actions?query=workflow%3ASterces)
+[![Build Status](https://github.com/wtfo-guru/sterces/workflows/Sterces/badge.svg)](https://github.com/wtfo-guru/sterces/actions?query=workflow%3ASterces)
 [![codecov](https://codecov.io/gh/wtfo-guru/sterces/branch/main/graph/badge.svg)](https://codecov.io/gh/wtfo-guru/sterces)
 [![Python Version](https://img.shields.io/pypi/pyversions/sterces.svg)](https://pypi.org/project/sterces/)
 [![wemake-python-styleguide](https://img.shields.io/badge/style-wemake-000000.svg)](https://github.com/wemake-services/wemake-python-styleguide)
