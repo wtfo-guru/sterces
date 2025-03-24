@@ -36,7 +36,24 @@ ATTRIBUTES = frozenset((USERNAME, PASSWORD, URL, NOTES, EXPIRY, TAGS, OTP))
 
 
 class StercesDatabase:
-    """StercesDatabase class."""
+    """StercesDatabase class.
+
+    :param `**kwargs`: The keyword arguments are used for ...
+    :ivar debug: debug level
+    :vartype debug: int, default 0
+    :ivar verbose: verbose level
+    :vartype verbose: int, default 0
+    :ivar db_fn: path of db file
+    :vartype db_fn: str, default ~/.sterces/db.kdbx
+    :ivar pwd_fn: path of passphrase file
+    :vartype pwd_fn: str, default ~/.sterces/.ssapeek
+    :ivar key_fn: path of key_fn
+    :vartype key_fn: str, optional
+    :ivar tf_key: transformation_key
+    :vartype tf_key: str, optional
+    :ivar warn: warn if permission are inadequate
+    :vartype warn: bool, default True
+    """
 
     debug: int
     verbose: int
@@ -46,19 +63,7 @@ class StercesDatabase:
     _dirty: int
 
     def __init__(self, **kwargs) -> None:
-        """Construct a StercesDatabase class.
-
-        :param kwargs: Additional optional keyword arguments.
-            - **debug**: debug level.
-            - **verbose**: verbosity level.
-            - **db_fn**: path of db file.
-            - **pwd_fn**: path of passphrase file.
-            - **key_fn**: path of key_fn.
-            - **tf_key**: transformation_key.
-            - **warn**: warn if permission are inadequate.
-        :type kwargs: dict
-
-        """
+        """Construct a StercesDatabase class."""
         self._dirty = False
         self.debug = kwargs.get("debug", 0)
         self.verbose = kwargs.get("verbose", 0)
@@ -74,8 +79,9 @@ class StercesDatabase:
     def kpo(self) -> PyKeePass:
         """Return the KeePass database object.
 
-        :raises ValueError When protected instance variable _kpobj is None
-        :return: return code
+        :raises ValueError: When protected instance variable _kpobj is None
+
+        :returns: return code
         :rtype: int
         """
         if self._kpobj is None:
@@ -94,7 +100,7 @@ class StercesDatabase:
         :type path: Optional[str]
         :param mask: mask password fields when True
         :type mask: bool
-        :return: return code
+        :returns: return code
         :rtype: int
         """
         e_list: list[dict[str, str]] = []
@@ -121,7 +127,7 @@ class StercesDatabase:
         :type action: str
         :param quiet: don't show groups when True
         :type quiet: bool
-        :return: return code
+        :returns: return code
         :rtype: int
         """
         if path:
@@ -151,7 +157,7 @@ class StercesDatabase:
         :type path: str
         :param attr: attribute to lookup
         :type attr: str
-        :return: value of found attribute or None
+        :returns: value of found attribute or None
         :rtype: Optional[str]
         """
         if attr in ATTRIBUTES:
@@ -181,7 +187,7 @@ class StercesDatabase:
 
         :param path: path of the entry to remove
         :type path: str
-        :return: return code
+        :returns: return code
         :rtype: int
         """
         entry = self.kpo.find_entries(path=self._str_to_path(path))
@@ -201,7 +207,7 @@ class StercesDatabase:
         :type path: Optional[str], optional
         :param mask: mask password, defaults to True
         :type mask: bool, optional
-        :return: return code
+        :returns: return code
         :rtype: int
         """
         if path:
@@ -234,14 +240,19 @@ class StercesDatabase:
         :type expiry: Optional[datetime]
         :param tags: list of tag strings
         :type tags: Optional[list[str]]
-        :param kwargs: Additional optional keyword arguments.
-            - **username**: Value of username property (default undef).
-            - **password**: Value of password property (default undef).
-            - **url**: Value of url property.
-            - **notes**: Value of notes property.
-            - **otp**: Value of otp property.
-        :type kwargs: dict
-        :return: return code
+        :param `**kwargs`: The keyword arguments are used for ...
+        :ivar username: Value of username property
+        :vartype username: str, default 'undef'
+        :ivar password: Value of password property
+        :vartype password: str, default 'undef'
+        :ivar url: Value of url property
+        :vartype url: str, optional
+        :ivar notes: Value of notes property
+        :vartype notes: str, optional
+        :ivar otp: Value of otp property
+        :vartype otp: str, optional
+
+        :returns: return code
         :rtype: int
         """
         keywords: list[str] = tags if tags else []
@@ -276,17 +287,23 @@ class StercesDatabase:
 
         :param path: path of the entry to update
         :type path: str
-        :param kwargs: Additional optional keyword arguments.
-            - **username**: Value of username property (default undef).
-            - **password**: Value of password property.
-            - **url**: Value of url property.
-            - **notes**: Value of notes property.
-            - **otp**: Value of otp property.
-            - **tags**: Comma separated list of tags.
-            - **expires**: String representation of expiry datetime.
-        :type kwargs: dict
+        :param `**kwargs`: The keyword arguments are used for ...
+        :ivar username: Value of username property
+        :vartype username: str, optional
+        :ivar password: Value of password property
+        :vartype password: str, optional
+        :ivar url: Value of url property
+        :vartype url: str, optional
+        :ivar notes: Value of notes property
+        :vartype notes: str, optional
+        :ivar otp: Value of otp property
+        :vartype otp: str, optional
+        :ivar expires: Value of expiration datetime
+        :vartype expires: str, optional
+
         :raises ValueError: When expires is not parsable
-        :return: return code
+
+        :returns: return code
         :rtype: int
         """
         entry = self.kpo.find_entries(path=self._str_to_path(path))
