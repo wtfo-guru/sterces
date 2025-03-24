@@ -23,9 +23,6 @@ root account is breached, the contents of my secrets files are the least of my w
 
 - Fully typed with annotations and checked with mypy, [PEP561 compatible](https://www.python.org/dev/peps/pep-0561/)
 
-- Add yours!
-
-
 ## Installation
 
 ```bash
@@ -44,5 +41,5 @@ pip install sterces
 
 ## Credits
 
-This project uses [`pykeepas`](https://github.com/libkeypass/pykeepass).
+This project uses [`pykeepass`](https://github.com/libkeypass/pykeepass).
 This project was tested with [`wemake-python-package`](https://github.com/wemake-services/wemake-python-package).
