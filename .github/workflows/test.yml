@@ -54,9 +54,8 @@ jobs:
       run: make ghtest
 
     # Upload coverage to codecov: https://codecov.io/
-    - name: Upload coverage to Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.WTF_CODECOV_TOKEN }}
+    - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:
-        files: ./coverage.xml
+        token: ${{ secrets.WTF_CODECOV_TOKEN }}
+        slug: wtfo-guru/sterces
