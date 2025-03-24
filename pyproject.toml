@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "sterces"
 version = "0.1.0"
-description = "Command line interface for pykeepass"
+description = "Wrapper for pykeepass library"
 license = "MIT"
 authors = ["Quien Sabe <qs5579@mail.com>"]
 readme = "README.md"
@@ -9,7 +9,7 @@ readme = "README.md"
 homepage = "https://github.com/wtfo-guru/sterces"
 documentation = "https://sterces.readthedocs.io/en/stable"
 
-keywords = []
+keywords = ["secrets", "keepass"]
 
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -26,9 +26,6 @@ classifiers = [
   "Topic :: Utilities",
   "Typing :: Typed",
 ]
-
-[tool.poetry.scripts]
-sterces = "sterces.cli:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
