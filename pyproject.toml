@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sterces"
-version = "0.1.0-dev1"
+version = "0.1.0"
 description = "Command line interface for pykeepass"
 license = "MIT"
 authors = ["Quien Sabe <qs5579@mail.com>"]
@@ -65,7 +65,7 @@ optional = true
 sphinx = "^8.0"
 sphinx-autodoc-typehints = "^3.0"
 tomli = "^2.0"
-m2r2 = "^0.3.3.post2"
+sphinx-mdinclude = "^0.6.2"
 
 [[tool.poetry.source]]
 name = "test-pypi"
