@@ -56,7 +56,7 @@ jobs:
     # Upload coverage to codecov: https://codecov.io/
     - name: Upload coverage to Codecov
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        CODECOV_TOKEN: ${{ secrets.WTF_CODECOV_TOKEN }}
       uses: codecov/codecov-action@v5
       with:
         files: ./coverage.xml
