@@ -28,7 +28,7 @@ def db():
     with open(ppf, "w") as fd:
         fd.write("abc1234567890def\n")
     database: Optional[PyKeePass] = StercesDatabase(
-        db_fn=str(dbf), pwd_fn=str(ppf), warn=False
+        db_fn=str(dbf), pwd_fn=str(ppf), warn=True
     )
 
     yield database

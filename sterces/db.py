@@ -59,7 +59,6 @@ class StercesDatabase:
     verbose: int
     _kpobj: Optional[PyKeePass]
     _check_status: dict[str, int]
-    _chmod: Optional[str]
     _dirty: int
 
     def __init__(self, **kwargs) -> None:
@@ -67,6 +66,7 @@ class StercesDatabase:
         self._dirty = False
         self.debug = kwargs.get("debug", 0)
         self.verbose = kwargs.get("verbose", 0)
+        self._check_status = {}
         self._kpobj = self._initialize_kpdb(
             kwargs.get("db_fn", DEFAULT_DB_FN),
             kwargs.get("pwd_fn", DEFAULT_PWD_FN),
