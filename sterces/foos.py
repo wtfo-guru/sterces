@@ -11,7 +11,7 @@ def str_to_date(date: str) -> Optional[datetime]:
 
     :param date: str representation of a datetime
     :type date: str
-    :return: datetime when date is parsable
+    :returns: datetime when date is parsable
     :rtype: Optional[datetime]
     """
     return dateparser.parse(date)

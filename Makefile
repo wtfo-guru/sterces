@@ -56,7 +56,7 @@ package:
 
 publish: version-sanity clean-build test
 	poetry publish --build
-	manage-tag.sh -u v$(PROJECT_VERSION)
+#	manage-tag.sh -u v$(PROJECT_VERSION)
 
 publish-test: version-sanity clean-build test
 	poetry publish --build -r test-pypi
