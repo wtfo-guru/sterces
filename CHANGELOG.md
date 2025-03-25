@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - variable initialization of _check_status in class StercesDatabase
 
-- docstrings formate for kwargs
+- docstrings format for kwargs
 
 ## [0.1.0] - 2025-03-24
 
