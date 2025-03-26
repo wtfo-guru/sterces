@@ -50,16 +50,17 @@ unit:
 	poetry run pytest tests
 
 package:
-	poetry check
+	poetry check --strict
 	poetry run pip check
 
 
-publish: version-sanity clean-build test
-	poetry publish --build
-#	manage-tag.sh -u v$(PROJECT_VERSION)
+publish: build
+	manage-tag.sh -u v$(PROJECT_VERSION)
+	gh release create v$(PROJECT_VERSION) --generate-notes
+	poetry publish
 
-publish-test: version-sanity clean-build test
-	poetry publish --build -r test-pypi
+publish-test: build
+	poetry publish -r test-pypi
 
 .PHONY: safety
 safety:
