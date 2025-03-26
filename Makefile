@@ -50,7 +50,7 @@ unit:
 	poetry run pytest tests
 
 package:
-	poetry check
+	poetry check --strict
 	poetry run pip check
 
 

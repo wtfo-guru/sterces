@@ -93,13 +93,15 @@ class StercesDatabase:
         """Return the version of the sterces library."""
         return VERSION
 
-    def dump(self, path: Optional[str], mask: bool = True) -> int:
+    def dump(self, path: Optional[str], mask: bool = True, indent: int = 0) -> int:
         """Dump the database to stdout.
 
         :param path: path to the output file
         :type path: Optional[str]
         :param mask: mask password fields when True
         :type mask: bool
+        :param indent: indent size when > 0 defaults to 0
+        :type indent: int
         :returns: return code
         :rtype: int
         """
@@ -115,7 +117,10 @@ class StercesDatabase:
             if entries:
                 for entry in entries:
                     e_list.append(self._entry_to_dict(entry, mask))
-        print(json.dumps(e_list))
+        if indent > 0:
+            print(json.dumps(e_list, indent=4))
+        else:
+            print(json.dumps(e_list))
         return 0
 
     def group(self, path: Optional[str], action: str, quiet: bool = True) -> int:
