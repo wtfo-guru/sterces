@@ -54,7 +54,7 @@ isort = "^6.0"
 black = "^25.0"
 pytest-click = "^1.1.0"
 testfixtures = "^8.3.0"
-types-dateparser = "^1.2.0.20250208"
+types-dateparser = "^1.2.0.20250408"
 flake8-docstrings = "^1.7.0"
 flake8-rst-docstrings = "^0.3.0"
 
