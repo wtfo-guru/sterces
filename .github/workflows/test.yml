@@ -51,7 +51,7 @@ jobs:
       run: poetry install --with test --no-interaction
 
     - name: Run checks
-      run: make ghtest
+      run: make citest
 
     # Upload coverage to codecov: https://codecov.io/
     - name: Upload coverage reports to Codecov
