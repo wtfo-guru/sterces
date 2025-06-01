@@ -3,10 +3,10 @@
 from datetime import datetime, timezone
 from shutil import rmtree
 from tempfile import mkdtemp
-from typing import Optional
+from typing import Generator, Optional
 
 import pytest
-from pykeepass.pykeepass import PyKeePass
+from pykeepass.pykeepass import PyKeePass  # type: ignore[import-untyped]
 
 from sterces.db import StercesDatabase
 
@@ -20,7 +20,7 @@ def expiry() -> datetime:
 
 
 @pytest.fixture(scope="session")
-def db():
+def db() -> Generator[Optional[PyKeePass], None, None]:
     """Create a test StercesDatabase."""
     td = mkdtemp()
     ppf = "{0}/.ssapeek".format(td)
