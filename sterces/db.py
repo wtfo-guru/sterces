@@ -1,5 +1,7 @@
 """Db module from sterces library."""
 
+# mypy: disable-error-code="explicit-any"
+
 import errno
 import json
 import os
@@ -7,12 +9,15 @@ import re
 from datetime import datetime
 from pathlib import Path
 from stat import filemode
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 from loguru import logger
-from pykeepass.entry import Entry
-from pykeepass.group import Group
-from pykeepass.pykeepass import PyKeePass, create_database
+from pykeepass.entry import Entry  # type: ignore[import-untyped]
+from pykeepass.group import Group  # type: ignore[import-untyped]
+from pykeepass.pykeepass import (  # type: ignore[import-untyped]
+    PyKeePass,
+    create_database,
+)
 
 from sterces.constants import (
     ADD,
@@ -61,18 +66,19 @@ class StercesDatabase:
     _check_status: dict[str, int]
     _dirty: int
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Union[bool, int, str]) -> None:
         """Construct a StercesDatabase class."""
         self._dirty = False
-        self.debug = kwargs.get("debug", 0)
-        self.verbose = kwargs.get("verbose", 0)
+        self.debug = int(kwargs.get("debug", 0))
+        self.verbose = int(kwargs.get("verbose", 0))
         self._check_status = {}
+        valor = kwargs.get("tf_key")
         self._kpobj = self._initialize_kpdb(
-            kwargs.get("db_fn", DEFAULT_DB_FN),
-            kwargs.get("pwd_fn", DEFAULT_PWD_FN),
-            kwargs.get("key_fn", ""),
-            kwargs.get("tf_key"),
-            kwargs.get("warn", True),
+            str(kwargs.get("db_fn", DEFAULT_DB_FN)),
+            str(kwargs.get("pwd_fn", DEFAULT_PWD_FN)),
+            str(kwargs.get("key_fn", "")),
+            str(valor) if valor is not None else None,  # noqa: WPS504
+            bool(kwargs.get("warn", True)),
         )
 
     @property
@@ -177,7 +183,7 @@ class StercesDatabase:
                         else None
                     )
                 else:
-                    return eval("entry.{0}".format(attr))
+                    return str(eval("entry.{0}".format(attr)))
             logger.error(ENTRY_NOT_EXIST.format(path))
         else:
             logger.error(
@@ -235,7 +241,7 @@ class StercesDatabase:
         path: str,
         expiry: Optional[datetime],
         tags: Optional[list[str]],
-        **kwargs,
+        **kwargs: Any,
     ) -> int:
         """Add a new entry to the database.
 
@@ -286,7 +292,7 @@ class StercesDatabase:
     def update(  # noqa: WPS231, C901
         self,
         path: str,
-        **kwargs,
+        **kwargs: Any,
     ) -> int:
         """Update the entry specified by path.
 

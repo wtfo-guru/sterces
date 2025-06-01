@@ -1,23 +1,28 @@
+# pkgtmpl/Makefile revision 001
+
 SHELL:=/usr/bin/env bash
 
 PROJECT_NAME = $(shell head -10 pyproject.toml|grep ^name | awk '{print $$NF}'|tr -d '"' | tr '-' '_')
 PROJECT_VERSION = $(shell head -10 pyproject.toml|grep ^version | awk '{print $$NF}'|tr -d '"')
+PACKAGE_DIR = $(PROJECT_NAME)
 WHEEL_VERSION = $(shell echo $(PROJECT_VERSION)|sed -e 's/-dev/.dev/')
 BUMP_VERSION = $(shell grep ^current_version .bumpversion.cfg | awk '{print $$NF}')
-CONST_VERSION = $(shell grep ^VERSION $(PROJECT_NAME)/constants.py | awk '{print $$NF}'|tr -d '"')
+CONST_VERSION = $(shell grep ^VERSION $(PACKAGE_DIR)/constants.py | awk '{print $$NF}'|tr -d '"')
 TEST_MASK ?= tests/*.py
 
-.PHONY: black mypy lint sunit unit package test publish publish-test
+.PHONY: poetry-update
+poetry-update:
+	poetry update --with test --with docs
 
 .PHONY: update
-update:
-	poetry update --with test --with docs
+update: poetry-update safety
 	pre-commit-update-repo.sh
 
 .PHONY: vars
 vars:
 	@echo "PROJECT_NAME: $(PROJECT_NAME)"
 	@echo "PROJECT_VERSION: $(PROJECT_VERSION)"
+	@echo "PACKAGE_DIR: $(PACKAGE_DIR)"
 	@echo "WHEEL_VERSION: $(WHEEL_VERSION)"
 	@echo "BUMP_VERSION: $(BUMP_VERSION)"
 	@echo "CONST_VERSION: $(CONST_VERSION)"
@@ -32,55 +37,63 @@ ifneq ($(PROJECT_VERSION), $(CONST_VERSION))
 endif
 	@echo "Versions are equal $(PROJECT_VERSION), $(BUMP_VERSION), $(CONST_VERSION)"
 
+.PHONY: black
 black:
-	poetry run isort $(PROJECT_NAME) $(TEST_MASK)
-	poetry run black $(PROJECT_NAME) $(TEST_MASK)
+	poetry run isort $(PACKAGE_DIR) $(TEST_MASK)
+	poetry run black $(PACKAGE_DIR) $(TEST_MASK)
 
+.PHONY: mypy
 mypy: black
-	poetry run mypy $(PROJECT_NAME) $(TEST_MASK)
+	poetry run mypy $(PACKAGE_DIR) $(TEST_MASK)
 
+.PHONY: lint
 lint: mypy
-	poetry run flake8 $(PROJECT_NAME) $(TEST_MASK)
+	poetry run flake8 $(PACKAGE_DIR) $(TEST_MASK)
 	poetry run doc8 -q docs
 
+.PHONY: sunit
 sunit:
 	poetry run pytest -s tests
 
+.PHONY: unit
 unit:
 	poetry run pytest tests
 
+.PHONY: package
 package:
 	poetry check --strict
 	poetry run pip check
 
-
+.PHONY: publish
 publish: build
 	manage-tag.sh -u v$(PROJECT_VERSION)
 	gh release create v$(PROJECT_VERSION) --generate-notes
 	poetry publish
 
+.PHONY: publish-test
 publish-test: build
 	poetry publish -r test-pypi
 
 .PHONY: safety
 safety:
-	poetry run safety scan --full-report
+	safety scan --full-report
 
 .PHONY: nitpick
 nitpick:
 	poetry run nitpick -p . check
 
 .PHONY: test
-test: nitpick lint package safety unit
+test: nitpick lint package unit
 
-.PHONY: ghtest
-ghtest: lint package unit
+.PHONY: citest
+citest: lint package unit
 
 .PHONY: build
 build: version-sanity safety clean-build test
 	poetry build
+ifdef SYNCH_WHEELS
 	sync-wheels.sh dist/$(PROJECT_NAME)-$(WHEEL_VERSION)-py3-none-any.whl $(WHEELS)
-#	manage-tag.sh -u v$(PROJECT_VERSION)
+endif
 
 .PHONY: docs
 docs:

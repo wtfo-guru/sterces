@@ -1,11 +1,12 @@
 """Tests module test_database for sterces library."""
 
 from datetime import datetime, timezone
+from typing import Generator
 
 import pytest
 from _pytest.logging import LogCaptureFixture
 from loguru import logger
-from pykeepass.pykeepass import PyKeePass
+from pykeepass.pykeepass import PyKeePass  # type: ignore[import-untyped]
 
 from sterces.constants import ADD, REMOVE, VERSION
 from sterces.db import ATTRIBUTES, ENTRY_NOT_EXIST
@@ -16,7 +17,7 @@ ENTRY_TEST_TRES = "/test/test2"
 
 
 @pytest.fixture
-def caplog(caplog: LogCaptureFixture):
+def caplog(caplog: LogCaptureFixture) -> Generator[LogCaptureFixture, None, None]:
     """Capture loguru logs."""
     handler_id = logger.add(
         caplog.handler,
@@ -29,12 +30,12 @@ def caplog(caplog: LogCaptureFixture):
     logger.remove(handler_id)
 
 
-def test_db_version(db: PyKeePass):
+def test_db_version(db: PyKeePass) -> None:
     """Test version property."""
     assert db.version == VERSION
 
 
-def test_group_add(db: PyKeePass, capsys):
+def test_group_add(db: PyKeePass, capsys: pytest.CaptureFixture[str]) -> None:
     """Test group add."""
     db.group("/internet/email/gmail/qs5779/", ADD, quiet=False)
     out, err = capsys.readouterr()
@@ -44,14 +45,16 @@ def test_group_add(db: PyKeePass, capsys):
     )
 
 
-def test_group_remove(db: PyKeePass, capsys):
+def test_group_remove(db: PyKeePass, capsys: pytest.CaptureFixture[str]) -> None:
     """Test group remove."""
     db.group("/internet", REMOVE, quiet=False)
     out, err = capsys.readouterr()
     assert '[Group: ""]' in out
 
 
-def test_entry_add(db: PyKeePass, expiry: datetime, capsys):
+def test_entry_add(
+    db: PyKeePass, expiry: datetime, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Test entry add."""
     db.store(ENTRY_TEST_UNO, expiry, ["test", "uno"], password="passw0rd")
     out, err = capsys.readouterr()
@@ -64,7 +67,9 @@ def test_entry_add(db: PyKeePass, expiry: datetime, capsys):
     assert match in out
 
 
-def test_entry_lookup(db: PyKeePass, expiry: datetime, caplog):
+def test_entry_lookup(
+    db: PyKeePass, expiry: datetime, caplog: LogCaptureFixture
+) -> None:
     """Test entry add."""
     attrs = {
         "username": "undef",
@@ -82,14 +87,21 @@ def test_entry_lookup(db: PyKeePass, expiry: datetime, caplog):
     assert match in caplog.text
 
 
-def test_entry_add_dup(db: PyKeePass, expiry: datetime, capsys, caplog):
+def test_entry_add_dup(
+    db: PyKeePass,
+    expiry: datetime,
+    capsys: pytest.CaptureFixture[str],
+    caplog: LogCaptureFixture,
+) -> None:
     """Test entry add duplicate."""
     db.store(ENTRY_TEST_UNO, expiry, ["test", "uno"], password="passw0rd")
     out, err = capsys.readouterr()
     assert "Entry /test/test1 already exists" in caplog.text
 
 
-def test_entry_update_username(db: PyKeePass, expiry: datetime, capsys):
+def test_entry_update_username(
+    db: PyKeePass, expiry: datetime, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Test entry update username."""
     db.update(ENTRY_TEST_UNO, username="joeblow")
     out, err = capsys.readouterr()
@@ -102,7 +114,9 @@ def test_entry_update_username(db: PyKeePass, expiry: datetime, capsys):
     assert match in out
 
 
-def test_entry_show_all(db: PyKeePass, expiry: datetime, capsys):
+def test_entry_show_all(
+    db: PyKeePass, expiry: datetime, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Test entry show all."""
     db.store(ENTRY_TEST_DOS, expiry, ["test", "dos"], password="passw0rd")
     db.show()
@@ -122,7 +136,9 @@ def test_entry_show_all(db: PyKeePass, expiry: datetime, capsys):
     assert match in out
 
 
-def test_entry_show_one(db: PyKeePass, expiry: datetime, capsys):
+def test_entry_show_one(
+    db: PyKeePass, expiry: datetime, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Test entry show one."""
     db.show(ENTRY_TEST_DOS)
     out, err = capsys.readouterr()
@@ -141,7 +157,7 @@ def test_entry_show_one(db: PyKeePass, expiry: datetime, capsys):
     assert match not in out
 
 
-def test_entry_remove(db: PyKeePass, caplog):
+def test_entry_remove(db: PyKeePass, caplog: LogCaptureFixture) -> None:
     """Test entry remove."""
     db.remove(ENTRY_TEST_UNO)
     db.remove(ENTRY_TEST_DOS)
@@ -153,7 +169,7 @@ def test_entry_remove(db: PyKeePass, caplog):
     assert match in caplog.text
 
 
-def test_entry_show_none(db: PyKeePass, caplog):
+def test_entry_show_none(db: PyKeePass, caplog: LogCaptureFixture) -> None:
     """Test show none."""
     db.show()
     assert "No entries found" in caplog.text
